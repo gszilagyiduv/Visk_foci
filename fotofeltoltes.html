@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fotó feltöltése — TJ Družstevník Vyškovce nad Ipľom</title>
+<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="brand">
+    <img src="assets/logo.jpg" alt="TJ Družstevník Vyškovce nad Ipľom címere">
+    <div class="txt"><b>Vyškovce nad Ipľom</b><small>TJ Družstevník</small></div>
+  </a>
+  <button class="menu-toggle" id="menu-toggle">☰ Menü</button>
+  <nav id="fo-nav">
+    <a href="index.html">Kezdőlap</a>
+    <a href="jatekosok.html">Játékoskeret</a>
+    <a href="naptar.html">Meccsek</a>
+    <a href="gollovok.html">Góllövőlista</a>
+    <a href="eredmenyek.html">Bajnoki tábla</a>
+    <a href="fotofeltoltes.html" class="active">Fotó feltöltése</a>
+  </nav>
+</header>
+
+<section style="border-bottom:none;">
+  <div class="pennant" style="margin-bottom:18px;">Szerkesztés</div>
+  <div class="section-head"><h2>Játékosfotó feltöltése</h2><div class="bar"></div></div>
+  <p style="color:var(--grey); max-width:56ch; margin-bottom:24px;">
+    Válaszd ki a játékost, majd tölts fel egy fotót róla. A kép a csapat Google Drive-jába kerül,
+    és automatikusan megjelenik a Játékoskeret oldalon — nem kell hozzá semmilyen technikai tudás.
+    Ez a link nyilvános, bárki tud így fotót feltölteni, úgyhogy csak a csapaton belül oszd meg.
+  </p>
+
+  <div class="form-card">
+    <label for="jatekos-select">Játékos</label>
+    <select id="jatekos-select"><option>Betöltés…</option></select>
+
+    <label for="foto-input">Fotó (JPG vagy PNG, max ~5 MB)</label>
+    <input type="file" id="foto-input" accept="image/png, image/jpeg">
+
+    <button class="primary" id="feltoltes-gomb">Feltöltés</button>
+    <div class="form-status" id="feltoltes-statusz"></div>
+  </div>
+</section>
+
+<footer>TJ Družstevník Vyškovce nad Ipľom — © <span id="ev"></span></footer>
+
+<script src="script.js"></script>
+<script>
+document.getElementById('ev').textContent = new Date().getFullYear();
+
+async function toltsdBeJatekosValasztot() {
+  const select = document.getElementById('jatekos-select');
+  try {
+    const jatekosok = await apiHivas('alapadatok');
+    if (!jatekosok.length) {
+      select.innerHTML = '<option>Nincs elérhető játékos</option>';
+      return;
+    }
+    jatekosok.sort((a, b) => a.nev.localeCompare(b.nev, 'hu'));
+    select.innerHTML = jatekosok.map(j => `<option value="${esc(j.nev)}">${esc(j.nev)}</option>`).join('');
+  } catch (err) {
+    select.innerHTML = '<option>Hiba a betöltéskor</option>';
+  }
+}
+toltsdBeJatekosValasztot();
+
+function fajlBase64Kent(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+document.getElementById('feltoltes-gomb').addEventListener('click', async () => {
+  const nev = document.getElementById('jatekos-select').value;
+  const fajl = document.getElementById('foto-input').files[0];
+  const statusz = document.getElementById('feltoltes-statusz');
+  const gomb = document.getElementById('feltoltes-gomb');
+
+  statusz.className = 'form-status';
+  statusz.textContent = '';
+
+  if (!nev) { statusz.className = 'form-status err'; statusz.textContent = 'Válassz ki egy játékost.'; return; }
+  if (!fajl) { statusz.className = 'form-status err'; statusz.textContent = 'Válassz ki egy fotót.'; return; }
+  if (fajl.size > 6 * 1024 * 1024) { statusz.className = 'form-status err'; statusz.textContent = 'Túl nagy a fájl (max ~5-6 MB).'; return; }
+
+  gomb.disabled = true;
+  statusz.textContent = 'Feltöltés folyamatban…';
+
+  try {
+    const base64 = await fajlBase64Kent(fajl);
+    await apiPost({
+      action: 'fotoFeltoltes',
+      nev: nev,
+      fileName: fajl.name,
+      mimeType: fajl.type,
+      fileData: base64
+    });
+    statusz.className = 'form-status ok';
+    statusz.textContent = `Sikeres feltöltés! A(z) ${nev} fotója hamarosan megjelenik a Játékoskeret oldalon.`;
+    document.getElementById('foto-input').value = '';
+  } catch (err) {
+    statusz.className = 'form-status err';
+    statusz.textContent = 'Nem sikerült a feltöltés: ' + err.message;
+  } finally {
+    gomb.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
