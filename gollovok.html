@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Góllövőlista — TJ Družstevník Vyškovce nad Ipľom</title>
+<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="brand">
+    <img src="assets/logo.jpg" alt="TJ Družstevník Vyškovce nad Ipľom címere">
+    <div class="txt"><b>Vyškovce nad Ipľom</b><small>TJ Družstevník</small></div>
+  </a>
+  <button class="menu-toggle" id="menu-toggle">☰ Menü</button>
+  <nav id="fo-nav">
+    <a href="index.html">Kezdőlap</a>
+    <a href="jatekosok.html">Játékoskeret</a>
+    <a href="naptar.html">Meccsek</a>
+    <a href="gollovok.html" class="active">Góllövőlista</a>
+    <a href="eredmenyek.html">Bajnoki tábla</a>
+    <a href="fotofeltoltes.html">Fotó feltöltése</a>
+  </nav>
+</header>
+
+<section style="border-bottom:none;">
+  <div class="pennant" style="margin-bottom:18px;">Statisztika</div>
+  <div class="section-head"><h2>Góllövőlista</h2><span class="hint">az összes heti fül gól-oszlopából összesítve</span><div class="bar"></div></div>
+  <div id="gollovo-lista"><div class="loading-note">Betöltés…</div></div>
+</section>
+
+<footer>TJ Družstevník Vyškovce nad Ipľom — © <span id="ev"></span></footer>
+
+<script src="script.js"></script>
+<script>
+document.getElementById('ev').textContent = new Date().getFullYear();
+
+async function toltsdBeGollovoket() {
+  const lista = document.getElementById('gollovo-lista');
+  try {
+    const gollovok = await apiHivas('gollovok');
+    if (!gollovok.length) {
+      lista.innerHTML = '<div class="empty-note">Még nincs rögzített gól egyik heti fülben sem.</div>';
+      return;
+    }
+    lista.innerHTML = `<div class="form-card" style="max-width:600px; padding:10px 22px;">` +
+      gollovok.map((g, i) => `
+        <div class="scorer-row fade-in">
+          <div class="scorer-rank">${i + 1}.</div>
+          <div class="scorer-name">${esc(g.nev)}</div>
+          <div class="scorer-goals">${g.gol}</div>
+        </div>
+      `).join('') + `</div>`;
+  } catch (err) {
+    lista.innerHTML = `<div class="empty-note">Nem sikerült betölteni a góllövőlistát: ${esc(err.message)}</div>`;
+  }
+}
+toltsdBeGollovoket();
+</script>
+</body>
+</html>
