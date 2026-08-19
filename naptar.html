@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meccsek — TJ Družstevník Vyškovce nad Ipľom</title>
+<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="brand">
+    <img src="assets/logo.jpg" alt="TJ Družstevník Vyškovce nad Ipľom címere">
+    <div class="txt"><b>Vyškovce nad Ipľom</b><small>TJ Družstevník</small></div>
+  </a>
+  <button class="menu-toggle" id="menu-toggle">☰ Menü</button>
+  <nav id="fo-nav">
+    <a href="index.html">Kezdőlap</a>
+    <a href="jatekosok.html">Játékoskeret</a>
+    <a href="naptar.html" class="active">Meccsek</a>
+    <a href="gollovok.html">Góllövőlista</a>
+    <a href="eredmenyek.html">Bajnoki tábla</a>
+    <a href="fotofeltoltes.html">Fotó feltöltése</a>
+  </nav>
+</header>
+
+<section style="border-bottom:none;">
+  <div class="pennant" style="margin-bottom:18px;">Menetrend</div>
+  <div class="section-head"><h2>Meccsek és eredmények</h2><span class="hint">a heti fülek dátuma alapján, legújabb elöl</span><div class="bar"></div></div>
+  <div id="meccs-lista"><div class="loading-note">Betöltés…</div></div>
+</section>
+
+<footer>TJ Družstevník Vyškovce nad Ipľom — © <span id="ev"></span></footer>
+
+<script src="script.js"></script>
+<script>
+document.getElementById('ev').textContent = new Date().getFullYear();
+
+async function toltsdBeMeccseket() {
+  const lista = document.getElementById('meccs-lista');
+  try {
+    const meccsek = await apiHivas('meccsek');
+    if (!meccsek.length) {
+      lista.innerHTML = '<div class="empty-note">Még nincs egyetlen heti fül sem (elnevezés: NN-HH-ÉÉÉÉ, pl. 22-08-2026).</div>';
+      return;
+    }
+    lista.innerHTML = meccsek.map(m => `
+      <div class="match-row fade-in">
+        <div class="match-date">${esc(m.datum)}</div>
+        <div class="match-teams"><span class="us">Vyškovce</span> — ${esc(m.ellenfel || 'Ellenfél még nincs megadva')}</div>
+        <div class="match-score ${m.vegeredmeny ? '' : 'none'}">${esc(m.vegeredmeny || 'nincs eredmény')}</div>
+      </div>
+    `).join('');
+  } catch (err) {
+    lista.innerHTML = `<div class="empty-note">Nem sikerült betölteni a meccseket: ${esc(err.message)}</div>`;
+  }
+}
+toltsdBeMeccseket();
+</script>
+</body>
+</html>
