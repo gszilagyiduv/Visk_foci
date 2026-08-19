@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TJ Družstevník Vyškovce nad Ipľom</title>
+<meta name="description" content="A TJ Družstevník Vyškovce nad Ipľom labdarúgócsapat hivatalos honlapja: eredmények, góllövőlista, bajnoki tábla, játékoskeret.">
+<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="brand">
+    <img src="assets/logo.jpg" alt="TJ Družstevník Vyškovce nad Ipľom címere">
+    <div class="txt"><b>Vyškovce nad Ipľom</b><small>TJ Družstevník</small></div>
+  </a>
+  <button class="menu-toggle" id="menu-toggle">☰ Menü</button>
+  <nav id="fo-nav">
+    <a href="index.html" class="active">Kezdőlap</a>
+    <a href="jatekosok.html">Játékoskeret</a>
+    <a href="naptar.html">Meccsek</a>
+    <a href="gollovok.html">Góllövőlista</a>
+    <a href="eredmenyek.html">Bajnoki tábla</a>
+    <a href="fotofeltoltes.html">Fotó feltöltése</a>
+  </nav>
+</header>
+
+<div class="scoreboard">
+  <div class="scoreboard-inner">
+    <div>
+      <div class="eyebrow"><div class="chip"></div><span>Hivatalos csapatoldal</span></div>
+      <h1>Hajrá <em>Vyškovce</em>! Minden meccs, minden gól, egy helyen.</h1>
+      <p class="lead">Kövesd a csapat heti eredményeit, a góllövőlistát és a bajnoki tabellát — élőben frissülő adatokkal, közvetlenül a csapat táblázatából.</p>
+    </div>
+    <div class="led-panel">
+      <div class="led-label" id="lp-cimke">Legutóbbi meccs</div>
+      <div class="led-row">
+        <span class="led-team" id="lp-csapat1">Vyškovce</span>
+        <span class="led-score" id="lp-eredmeny">–:–</span>
+        <span class="led-team" id="lp-csapat2">–</span>
+      </div>
+      <div class="led-divider"></div>
+      <div class="led-sub" id="lp-datum">betöltés…</div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="section-head"><h2>Gyors áttekintő</h2><div class="bar"></div></div>
+  <div class="grid">
+    <div class="stat-card">
+      <div class="k">Keretben szereplő játékos</div>
+      <div class="v" id="qs-jatekosok">–</div>
+    </div>
+    <div class="stat-card">
+      <div class="k">Rögzített meccs</div>
+      <div class="v" id="qs-meccsek">–</div>
+    </div>
+    <div class="stat-card">
+      <div class="k">Csapat gólkirálya</div>
+      <div class="v" id="qs-golkiraly" style="font-size:22px;">–</div>
+    </div>
+    <div class="stat-card">
+      <div class="k">Lőtt gól összesen</div>
+      <div class="v" id="qs-osszgol">–</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><h2>Legutóbbi eredmények</h2><span class="hint">a legfrissebb 5 meccs</span><div class="bar"></div></div>
+  <div id="legutobbi-meccsek"><div class="loading-note">Betöltés…</div></div>
+</section>
+
+<footer>TJ Družstevník Vyškovce nad Ipľom — © <span id="ev"></span></footer>
+
+<script src="script.js"></script>
+<script>
+document.getElementById('ev').textContent = new Date().getFullYear();
+
+async function toltsdBeKezdolapot() {
+  try {
+    const [jatekosok, meccsek, gollovok] = await Promise.all([
+      apiHivas('alapadatok'),
+      apiHivas('meccsek'),
+      apiHivas('gollovok')
+    ]);
+
+    document.getElementById('qs-jatekosok').textContent = jatekosok.length;
+    document.getElementById('qs-meccsek').textContent = meccsek.filter(m => m.vegeredmeny).length;
+    document.getElementById('qs-golkiraly').textContent = gollovok.length ? `${gollovok[0].nev} (${gollovok[0].gol})` : '–';
+    document.getElementById('qs-osszgol').textContent = gollovok.reduce((s, g) => s + g.gol, 0);
+
+    const jatszottak = meccsek.filter(m => m.vegeredmeny);
+    if (jatszottak.length) {
+      const legutobbi = jatszottak[0];
+      document.getElementById('lp-cimke').textContent = 'Legutóbbi meccs';
+      document.getElementById('lp-csapat2').textContent = legutobbi.ellenfel || 'Ellenfél';
+      document.getElementById('lp-eredmeny').textContent = legutobbi.vegeredmeny;
+      document.getElementById('lp-datum').textContent = legutobbi.datum;
+    } else {
+      document.getElementById('lp-cimke').textContent = 'Még nincs rögzített eredmény';
+      document.getElementById('lp-datum').textContent = 'Nézz vissza hamarosan!';
+    }
+
+    const lista = document.getElementById('legutobbi-meccsek');
+    const utolso5 = jatszottak.slice(0, 5);
+    if (!utolso5.length) {
+      lista.innerHTML = '<div class="empty-note">Még nincs feltöltött meccseredmény.</div>';
+      return;
+    }
+    lista.innerHTML = utolso5.map(m => `
+      <div class="match-row fade-in">
+        <div class="match-date">${esc(m.datum)}</div>
+        <div class="match-teams"><span class="us">Vyškovce</span> — ${esc(m.ellenfel || 'Ellenfél')}</div>
+        <div class="match-score">${esc(m.vegeredmeny)}</div>
+      </div>
+    `).join('');
+  } catch (err) {
+    document.getElementById('legutobbi-meccsek').innerHTML =
+      `<div class="empty-note">Nem sikerült betölteni az adatokat: ${esc(err.message)}</div>`;
+  }
+}
+toltsdBeKezdolapot();
+</script>
+</body>
+</html>
