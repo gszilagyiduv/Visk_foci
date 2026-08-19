@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bajnoki tábla — TJ Družstevník Vyškovce nad Ipľom</title>
+<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="brand">
+    <img src="assets/logo.jpg" alt="TJ Družstevník Vyškovce nad Ipľom címere">
+    <div class="txt"><b>Vyškovce nad Ipľom</b><small>TJ Družstevník</small></div>
+  </a>
+  <button class="menu-toggle" id="menu-toggle">☰ Menü</button>
+  <nav id="fo-nav">
+    <a href="index.html">Kezdőlap</a>
+    <a href="jatekosok.html">Játékoskeret</a>
+    <a href="naptar.html">Meccsek</a>
+    <a href="gollovok.html">Góllövőlista</a>
+    <a href="eredmenyek.html" class="active">Bajnoki tábla</a>
+    <a href="fotofeltoltes.html">Fotó feltöltése</a>
+  </nav>
+</header>
+
+<section style="border-bottom:none;">
+  <div class="pennant" style="margin-bottom:18px;">Bajnokság</div>
+  <div class="section-head"><h2>Bajnoki tábla</h2><span class="hint">a "Tabla" fülről, kézzel frissítve</span><div class="bar"></div></div>
+  <div id="tabla-tartalom"><div class="loading-note">Betöltés…</div></div>
+</section>
+
+<footer>TJ Družstevník Vyškovce nad Ipľom — © <span id="ev"></span></footer>
+
+<script src="script.js"></script>
+<script>
+document.getElementById('ev').textContent = new Date().getFullYear();
+
+async function toltsdBeTablat() {
+  const cel = document.getElementById('tabla-tartalom');
+  try {
+    const tabla = await apiHivas('tabla');
+    if (!tabla.fejlec.length || !tabla.sorok.length) {
+      cel.innerHTML = `<div class="empty-note">
+        Még nincs "Tabla" nevű fül a táblázatban, vagy üres. Hozz létre egy új fület
+        "Tabla" névvel, az első sorba írd az oszlopneveket (pl. Helyezés, Csapat, M, Gy, D, V, Rúgott, Kapott, Gólkül., Pont),
+        alá pedig a csapatok adatait — ez az oldal automatikusan megjeleníti.
+      </div>`;
+      return;
+    }
+    const fejSor = tabla.fejlec.map(f => `<th>${esc(f)}</th>`).join('');
+    const sorok = tabla.sorok.map(sor => {
+      const sajat = sor.some(cella => String(cella).toLowerCase().includes('vyškovce') || String(cella).toLowerCase().includes('vyskovce'));
+      return `<tr class="${sajat ? 'sajat-csapat' : ''}">${sor.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`;
+    }).join('');
+    cel.innerHTML = `<div class="table-wrap"><table><tr>${fejSor}</tr>${sorok}</table></div>`;
+  } catch (err) {
+    cel.innerHTML = `<div class="empty-note">Nem sikerült betölteni a táblát: ${esc(err.message)}</div>`;
+  }
+}
+toltsdBeTablat();
+</script>
+</body>
+</html>
