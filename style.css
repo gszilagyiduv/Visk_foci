@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root{
+  --navy:#0B1F3A;
+  --navy-2:#122A4D;
+  --blue:#1E56A0;
+  --blue-bright:#2E7BD6;
+  --yellow:#F4C400;
+  --yellow-deep:#B98D00;
+  --ink:#101826;
+  --paper:#F5F7FA;
+  --white:#ffffff;
+  --line:#E1E6ED;
+  --grey:#5B6472;
+  --green:#2E8B4F;
+  --red:#C23B3B;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:'Inter', sans-serif; font-size:15.5px; line-height:1.5;
+}
+h1,h2,h3,.disp{font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:.3px;}
+a{color:inherit;}
+img{max-width:100%; display:block;}
+
+/* ===== Header / nav (pennant motif from the crest ribbon) ===== */
+header{
+  background:var(--navy); color:var(--white);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 40px; border-bottom:4px solid var(--yellow);
+  position:sticky; top:0; z-index:50;
+}
+.brand{display:flex; align-items:center; gap:14px; text-decoration:none;}
+.brand img{width:46px; height:46px; object-fit:contain;}
+.brand .txt b{display:block; font-family:'Oswald'; font-size:17px; text-transform:uppercase; letter-spacing:.5px;}
+.brand .txt small{display:block; font-size:10.5px; color:#9db3d1; letter-spacing:1.5px; text-transform:uppercase; margin-top:1px;}
+
+nav{display:flex; gap:2px; flex-wrap:wrap;}
+nav a{
+  color:#c3d2e8; text-decoration:none; font-family:'Oswald'; font-size:13px; text-transform:uppercase;
+  letter-spacing:.8px; padding:10px 14px; border-bottom:3px solid transparent; transition:color .15s, border-color .15s;
+}
+nav a:hover{color:var(--white);}
+nav a.active{color:var(--white); border-color:var(--yellow);}
+
+.menu-toggle{display:none; background:none; border:1px solid #2a3f61; color:var(--white); padding:8px 10px; border-radius:4px;}
+
+@media(max-width:820px){
+  header{padding:12px 18px; flex-wrap:wrap;}
+  nav{display:none; width:100%; flex-direction:column; padding-top:10px; border-top:1px solid #23385b; margin-top:10px;}
+  nav.open{display:flex;}
+  .menu-toggle{display:block;}
+  nav a{padding:10px 4px; border-bottom:1px solid #1c3155;}
+}
+
+/* ===== Scoreboard signature module ===== */
+.scoreboard{
+  background:var(--navy); background-image:radial-gradient(circle at 20% 20%, #16305c 0%, var(--navy) 60%);
+  color:var(--white); border-bottom:1px solid #0a1830;
+}
+.scoreboard-inner{
+  max-width:1080px; margin:0 auto; padding:48px 40px;
+  display:grid; grid-template-columns:1.1fr .9fr; gap:36px; align-items:center;
+}
+.eyebrow{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
+.eyebrow .chip{width:28px; height:3px; background:var(--yellow);}
+.eyebrow span{font-family:'Oswald'; font-size:12.5px; letter-spacing:2.5px; text-transform:uppercase; color:#9db3d1;}
+.scoreboard h1{font-size:clamp(26px,3.4vw,40px); font-weight:600; line-height:1.15; margin-bottom:14px;}
+.scoreboard h1 em{font-style:normal; color:var(--yellow);}
+.scoreboard p.lead{color:#c3d2e8; font-size:15px; max-width:46ch;}
+
+.led-panel{
+  background:#081428; border:1px solid #1c3155; border-radius:4px; padding:22px 24px;
+  box-shadow:inset 0 0 30px rgba(0,0,0,.4);
+}
+.led-row{display:flex; justify-content:space-between; align-items:center; font-family:'Oswald';}
+.led-label{font-size:11px; letter-spacing:2px; text-transform:uppercase; color:#6f88ab; margin-bottom:6px;}
+.led-team{font-size:15px; text-transform:uppercase; color:var(--white);}
+.led-score{font-size:42px; font-weight:700; color:var(--yellow); text-shadow:0 0 14px rgba(244,196,0,.45); letter-spacing:2px;}
+.led-divider{height:1px; background:#1c3155; margin:16px 0;}
+.led-sub{font-size:11.5px; color:#7d93b3; text-transform:uppercase; letter-spacing:1px;}
+
+/* ===== Sections ===== */
+section{padding:52px 40px; border-bottom:1px solid var(--line); max-width:1080px; margin:0 auto;}
+.section-head{display:flex; align-items:baseline; gap:16px; margin-bottom:28px; flex-wrap:wrap;}
+.section-head h2{font-size:24px; font-weight:600;}
+.section-head .bar{flex:1; height:1px; background:var(--line); min-width:40px;}
+.section-head .hint{font-size:12px; color:var(--grey); text-transform:none; letter-spacing:0; font-family:'Inter';}
+
+/* pennant/ribbon divider echoing the crest banner */
+.pennant{
+  display:inline-flex; align-items:center; gap:8px; background:var(--navy); color:var(--white);
+  font-family:'Oswald'; font-size:12px; letter-spacing:1.5px; text-transform:uppercase;
+  padding:6px 16px 6px 14px; clip-path:polygon(0 0,100% 0,94% 100%,0% 100%);
+}
+
+/* ===== Cards ===== */
+.grid{display:grid; grid-template-columns:repeat(4,1fr); gap:18px;}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:520px){.grid{grid-template-columns:1fr;}}
+
+.player-card{
+  background:var(--white); border:1px solid var(--line); border-radius:6px; overflow:hidden;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.player-card:hover{transform:translateY(-4px); box-shadow:0 14px 26px rgba(11,31,58,.12);}
+.player-photo{
+  aspect-ratio:1/1; background:linear-gradient(160deg,var(--blue),var(--navy)); position:relative;
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.player-photo img{width:100%; height:100%; object-fit:cover;}
+.player-photo .placeholder{color:rgba(255,255,255,.35); font-family:'Oswald'; font-size:52px;}
+.player-number{
+  position:absolute; top:8px; right:8px; background:var(--yellow); color:var(--navy);
+  font-family:'Oswald'; font-weight:700; font-size:14px; width:30px; height:30px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+}
+.player-info{padding:14px 16px;}
+.player-info .name{font-family:'Oswald'; font-size:16.5px; text-transform:uppercase; letter-spacing:.2px;}
+.player-info .meta{font-size:12px; color:var(--grey); margin-top:2px;}
+
+/* ===== Stat cards ===== */
+.stat-card{background:var(--white); border:1px solid var(--line); border-left:4px solid var(--blue); border-radius:4px; padding:20px 22px;}
+.stat-card .k{font-size:11.5px; text-transform:uppercase; letter-spacing:1px; color:var(--grey); font-weight:600; margin-bottom:10px;}
+.stat-card .v{font-family:'Oswald'; font-size:38px; font-weight:600;}
+
+/* ===== Tables ===== */
+table{width:100%; border-collapse:collapse; font-size:14px; background:var(--white);}
+th{
+  text-align:left; font-family:'Oswald'; text-transform:uppercase; font-size:11.5px; letter-spacing:.6px;
+  color:var(--white); background:var(--navy); padding:11px 10px; white-space:nowrap;
+}
+td{padding:11px 10px; border-bottom:1px solid var(--line);}
+tr:hover td{background:var(--paper);}
+tr.sajat-csapat td{background:#EFF6FF; font-weight:700;}
+.table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:6px;}
+.table-wrap table{border:none;}
+
+/* ===== Match list ===== */
+.match-row{
+  display:flex; align-items:center; gap:18px; padding:16px 18px; background:var(--white);
+  border:1px solid var(--line); border-radius:6px; margin-bottom:10px;
+}
+.match-date{font-family:'Oswald'; font-size:13px; color:var(--grey); min-width:84px;}
+.match-teams{flex:1; font-family:'Oswald'; font-size:16px; text-transform:uppercase;}
+.match-teams .us{color:var(--blue);}
+.match-score{
+  font-family:'Oswald'; font-size:20px; font-weight:700; background:var(--navy); color:var(--yellow);
+  padding:5px 14px; border-radius:4px; min-width:64px; text-align:center;
+}
+.match-score.none{background:var(--paper); color:var(--grey); font-size:12px; font-weight:400;}
+
+/* ===== Scorer list ===== */
+.scorer-row{display:flex; align-items:center; gap:14px; padding:12px 4px; border-bottom:1px dashed var(--line);}
+.scorer-rank{font-family:'Oswald'; font-size:15px; color:var(--grey); width:26px;}
+.scorer-name{flex:1; font-weight:600;}
+.scorer-goals{font-family:'Oswald'; font-size:18px; color:var(--blue); font-weight:700;}
+.scorer-row:first-child .scorer-goals{color:var(--yellow-deep);}
+
+/* ===== Forms (photo upload) ===== */
+.form-card{background:var(--white); border:1px solid var(--line); border-radius:6px; padding:28px; max-width:480px;}
+label{display:block; font-size:12.5px; text-transform:uppercase; letter-spacing:.5px; color:var(--grey); font-weight:600; margin:16px 0 6px;}
+label:first-child{margin-top:0;}
+select, input[type="file"]{
+  width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:4px; background:var(--paper); font-size:14px; font-family:'Inter';
+}
+button.primary{
+  margin-top:22px; background:var(--blue); color:var(--white); border:none; padding:12px 22px;
+  font-family:'Oswald'; text-transform:uppercase; letter-spacing:.6px; font-size:14px; border-radius:4px; cursor:pointer;
+  transition:background .15s;
+}
+button.primary:hover{background:var(--blue-bright);}
+button.primary:disabled{background:#a9b6c8; cursor:not-allowed;}
+.form-status{margin-top:14px; font-size:13px;}
+.form-status.ok{color:var(--green);}
+.form-status.err{color:var(--red);}
+
+.empty-note{color:var(--grey); font-size:14px; padding:18px 0;}
+.loading-note{color:var(--grey); font-size:13px; font-style:italic;}
+
+footer{padding:26px 40px; text-align:center; font-size:12.5px; color:var(--grey); background:var(--white);}
+
+.fade-in{animation:fadein .4s ease;}
+@keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
